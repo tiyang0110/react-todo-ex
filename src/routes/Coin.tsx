@@ -141,6 +141,10 @@ interface PriceData{
   };
 }
 
+interface ICoinProps {
+  
+}
+
 function Coin(){
   const { coinId } = useParams() as unknown as Params;
   const { state } = useLocation() as RouteState;
