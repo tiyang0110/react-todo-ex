@@ -1,5 +1,4 @@
 import { atom, selector } from "recoil";
-
 export enum Categories {
   "TODO" = "TODO",
   "DOING" = "DOING",
@@ -20,6 +19,19 @@ export const categoryState = atom<Categories>({
 export const todoState = atom<ITodo[]>({
   key: "todo",
   default: [],
+  effects: [({setSelf, onSet}) => {
+    const key = "todoList";
+    const savedValue = localStorage.getItem('todoList');
+    if (savedValue != null) {
+      setSelf(JSON.parse(savedValue));
+    }
+
+    onSet((newValue, _, isReset) => {
+      isReset
+        ? localStorage.removeItem(key)
+        : localStorage.setItem(key, JSON.stringify(newValue));
+    });
+  }]
 })
 
 export const todoSelector = selector({
@@ -27,6 +39,7 @@ export const todoSelector = selector({
   get: ({get}) => {
     const todos = get(todoState);
     const category = get(categoryState);
+
     return todos.filter(todo => todo.category === category);
   }
 })
