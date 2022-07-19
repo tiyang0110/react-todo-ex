@@ -1,73 +1,56 @@
-import { createGlobalStyle } from "styled-components";
-import TodoList from "./component/TodoList";
+import { DragDropContext, DropResult } from "react-beautiful-dnd";
+import { useRecoilState } from "recoil";
+import styled from "styled-components";
+import { todoState } from "./atmos";
+import Board from "./Components/Board";
 
-const GlobalStyle = createGlobalStyle`
-  @import url('https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400&display=swap');
 
-  html, body, div, span, applet, object, iframe,
-  h1, h2, h3, h4, h5, h6, p, blockquote, pre,
-  a, abbr, acronym, address, big, cite, code,
-  del, dfn, em, img, ins, kbd, q, s, samp,
-  small, strike, strong, sub, sup, tt, var,
-  b, u, i, center,
-  dl, dt, dd, ol, ul, li,
-  fieldset, form, label, legend,
-  table, caption, tbody, tfoot, thead, tr, th, td,
-  article, aside, canvas, details, embed, 
-  figure, figcaption, footer, header, hgroup, 
-  menu, nav, output, ruby, section, summary,
-  time, mark, audio, video {
-    margin: 0;
-    padding: 0;
-    border: 0;
-    font-size: 100%;
-    font: inherit;
-    vertical-align: baseline;
-  }
-  /* HTML5 display-role reset for older browsers */
-  article, aside, details, figcaption, figure, 
-  footer, header, hgroup, menu, nav, section {
-    display: block;
-  }
-  body {
-    line-height: 1;
-  }
-  ol, ul {
-    list-style: none;
-  }
-  blockquote, q {
-    quotes: none;
-  }
-  blockquote:before, blockquote:after,
-  q:before, q:after {
-    content: '';
-    content: none;
-  }
-  table {
-    border-collapse: collapse;
-    border-spacing: 0;
-  }
-  *{
-    box-sizing: border-box;
-  }
-  body{
-    font-family: 'Source Sans Pro', sans-serif;
-    background-color: ${(props) => props.theme.bgColor};
-    color: ${(props) => props.theme.textColor}
-  }
-  a{
-    text-decoration: none;
-    color: inherit;
-  }
-`
+const Wrapper = styled.div`
+  display: flex;
+  max-width: 680px;
+  width: 100%;
+  margin: 0 auto;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
 
-function App() {
+`;
 
+const Boards = styled.div`
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  width: 100%;
+  gap: 10px;
+`;
+
+
+function App(){
+  const [todos, setTodos] = useRecoilState(todoState);
+
+  const onDragEnd = (info:DropResult) => {
+    const { destination, draggableId, source } = info;
+    if(destination?.droppableId === source.droppableId){
+      // 같은 보드에서 움직임
+      setTodos((allBoard) => {
+        const boardCopy = [...allBoard[source.droppableId]];
+        boardCopy.splice(source.index, 1);
+        boardCopy.splice(destination?.index, 0, draggableId);
+        return {
+          ...allBoard,
+          [source.droppableId]: boardCopy
+        };
+      })
+    }
+
+  };
   return (
-    <>
-      <GlobalStyle />
-      <TodoList />
-    </>
+    <DragDropContext onDragEnd={onDragEnd}>
+      <Wrapper>
+        <Boards>
+          {Object.keys(todos).map((boardId) => <Board boardId={boardId} key={boardId} todos={todos[boardId]} />)}
+        </Boards>
+      </Wrapper>
+    </DragDropContext>
   );
 }
 
