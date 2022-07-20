@@ -18,6 +18,17 @@ const BoardName = styled.h1`
   margin-bottom: 10px;
 `;
 
+interface IAreaProps {
+  isDraggingover: boolean,
+  isDraggingFromThis: boolean
+}
+
+const Area = styled.div<IAreaProps>`
+  background-color: ${(props) => props.isDraggingover ? "pink" : props.isDraggingFromThis ? "red" : "blue"};
+  flex-grow: 1;
+  transition: background-color .3s ease-in-out;
+`;
+
 interface IBoardProps {
   todos: string[];
   boardId: string;
@@ -25,17 +36,19 @@ interface IBoardProps {
 
 function Board({todos, boardId}:IBoardProps){
   return(
-    <Droppable droppableId={boardId}>
-      {(provided) => (
-        <Wrapper ref={provided.innerRef} {...provided.droppableProps}>
-          <BoardName>{boardId}</BoardName>
-          {todos.map((todo, index) => (
-            <DragabbleCard key={todo} todo={todo} index={index} />
-          ))}
-          {provided.placeholder}
-        </Wrapper>
-      )}
-    </Droppable>
+    <Wrapper>
+      <BoardName>{boardId}</BoardName>
+      <Droppable droppableId={boardId}>
+        {(provided, snapshot) => (
+          <Area isDraggingover={snapshot.isDraggingOver} isDraggingFromThis={Boolean(snapshot.draggingFromThisWith)} style={{ width: "100%"}} ref={provided.innerRef} {...provided.droppableProps}>
+            {todos.map((todo, index) => (
+              <DragabbleCard key={todo} todo={todo} index={index} />
+            ))}
+            {provided.placeholder}
+          </Area>
+        )}
+      </Droppable>
+    </Wrapper>
   )
 }
 

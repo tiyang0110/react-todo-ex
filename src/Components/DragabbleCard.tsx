@@ -11,6 +11,7 @@ const Card = styled.div`
   box-sizing: border-box;
 `;
 
+
 interface IDragabbleCardProps{
   todo: string;
   index: number;
