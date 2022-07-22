@@ -33,6 +33,11 @@ const GlobalStyle = createGlobalStyle`
     color: black;
     line-height: 1.2;
   }
+
+  a{
+    color: #FFF;
+    text-decoration: none;
+  }
 `;
 
 const rootEl = document.getElementById("root");
